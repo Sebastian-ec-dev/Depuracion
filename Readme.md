@@ -74,7 +74,7 @@ flowchart TD
     A[Inicio] --> B[Leer JSON con ID]
     B --> C[Descargar Imagen/Video]
     C --> D[Construir Prompt Original]
-    D --> E[Analizar con Qwen (Analisis_M1.py) - Integrado con Prompt]
+    D --> E[Analizar con Qwen Analisis_M1.py - Integrado con Prompt]
     E --> F[Calcular Similitud y Veredicto]
     F --> G[Imprimir Resultados y Tiempo]
 ```
@@ -85,7 +85,7 @@ flowchart TD
     A[Inicio] --> B[Leer JSON con ID]
     B --> C[Descargar Imagen/Video]
     C --> D[Construir Prompt Original]
-    D --> E[Describir Contenido con Qwen (Analisis_M2.py)]
+    D --> E[Describir Contenido con Qwen Analisis_M2.py]
     E --> F[Comparar Descripción vs. Prompt con Llama]
     F --> G[Calcular Similitud y Veredicto]
     G --> H[Imprimir Resultados y Tiempo]
