@@ -74,7 +74,7 @@ flowchart TD
     A[Inicio] --> B[Leer JSON con ID]
     B --> C[Descargar Imagen/Video]
     C --> D[Construir Prompt Original]
-    D --> E[Analizar con Qwen (Analisis_M1.py) - Integrado con Prompt]
+    D --> E[Analizar con Qwen Analisis_M1.py - Integrado con Prompt]
     E --> F[Calcular Similitud y Veredicto]
     F --> G[Imprimir Resultados y Tiempo]
 ```
@@ -85,7 +85,7 @@ flowchart TD
     A[Inicio] --> B[Leer JSON con ID]
     B --> C[Descargar Imagen/Video]
     C --> D[Construir Prompt Original]
-    D --> E[Describir Contenido con Qwen (Analisis_M2.py)]
+    D --> E[Describir Contenido con Qwen Analisis_M2.py]
     E --> F[Comparar Descripción vs. Prompt con Llama]
     F --> G[Calcular Similitud y Veredicto]
     G --> H[Imprimir Resultados y Tiempo]
@@ -111,26 +111,67 @@ graph TD
 
 ## Comparación entre Modelos y Prototipos
 
-### Resultados Empíricos
-Basado en pruebas con IDs de muestra:
+Se evaluaron los dos enfoques principales con el mismo conjunto de publicaciones:
 
-#### Resultados con 1 Modelo (Prototipo_M1.py)
-- Mayor consistencia en cumplimiento: ~80-100% similitud en la mayoría de casos.
-- Tiempos bajos: 0.30-2.47 minutos.
-- Menos falsos negativos: Maneja contexto directo, detectando anomalías como "WARNING ANOMAL" sin pérdida.
-- Ejemplos:
-  - ID: ZVuB9PAAbI63JWD -1Q02 → 90% similitud, PASS ANOMALÍAS, Cumple (0:42 min).
-  - ID: Qt6i_xxLAa4EYIfk9mhXh → 100% similitud, PASS - ANOMAL, Cumple (02:50 min).
+- **Prototipo M1** — Análisis integrado en un solo paso (mejor retención de contexto, más rápido y preciso)  
+- **Prototipo M2** — Descripción + comparación en dos pasos (más propenso a pérdida de detalles sutiles)
 
-#### Resultados con 2 Modelos (Prototipo_M2.py)
-- Similitud variable: 40-92%, con más "WARNING" y "No cumple".
-- Tiempos más altos: 03:50-12:16 minutos debido a pasos intermedios.
-- Más falsos negativos: La descripción de Qwen puede omitir detalles clave, llevando a Llama a fallar en comparaciones (e.g., 40% en ID: Qt6i_xxLAa4EYIfk9mhXh).
-- Ejemplos:
-  - ID: ZVuB9PAAbI63JWD -1Q02 → 92% similitud, PASS AN, Cumple (06:19 min).
-  - ID: FNQMUoN_ntbezHvHEP8a9 → 80% similitud, WARNING, No cumple (7:39 min).
+### Resumen Comparativo
 
-**Conclusión de Prototipos:** M1 es superior para precisión y eficiencia, ya que evita la degradación de contexto en pipelines multi-modelo. M2 es útil para depuración detallada, pero genera más errores falsos.
+| Métrica                     | Prototipo M1 (1 paso) | Prototipo M2 (2 pasos) | Observación                          |
+|-----------------------------|------------------------|-------------------------|--------------------------------------|
+| Tiempo promedio por ítem    | ~1:10 min             | ~8:00 min              | M1 es ~7× más rápido                |
+| Similitud promedio          | ~92–95%               | ~80–85%                | M1 más consistente                  |
+| Tasa de "Cumple"            | ~85%                  | ~70%                   | Menos falsos negativos en M1        |
+| Detección de anomalías sutiles | Alta                 | Media-baja             | M1 preserva mejor el contexto       |
+
+### Resultados detallados por publicación
+
+#### Prototipo M1 – Análisis integrado
+
+| ID                          | Similitud | Tiempo    | Resultado    |
+|-----------------------------|-----------|-----------|--------------|
+| ZVuB9PAAbI63JWD_-1QOQ02    | 90%       | 0:42 min  | 🟢 Cumple    |
+| ULmQfIB6e3OIR379gYUyM      | 95%       | 0:53 min  | 🔴 No cumple |
+| JJkJ1qGcF4yQom7R0vEYr      | 95%       | 1:30 min  | 🔴 No cumple |
+| WFwwwbOSntpUamcuIrZeG      | 95%       | 0:50 min  | 🟢 Cumple    |
+| 3dw2pBQJlepGXC2UNx         | 95%       | 2:52 min  | 🟢 Cumple    |
+| DYCXSqzwbb1lu1MFf_d5f      | 85%       | 1:23 min  | 🟢 Cumple    |
+| FNQM uON_ntbezHvHEP8a9     | 90%       | 2:47 min  | 🟢 Cumple    |
+| min6SBxVz6oQs-U10kD6h      | 90%       | 0:50 min  | 🟢 Cumple    |
+| IpRVHFyVvxxRSpRtFZWay      | 95%       | 0:50 min  | 🟢 Cumple    |
+| i8mW5UliDsw7mMUBuQz        | 90%       | 1:05 min  | 🟢 Cumple    |
+| P2BGozXKKHbTyOHMOEh2jK     | 90%       | 0:30 min  | 🟢 Cumple    |
+| mb8eLJxUX2TIWuZY8UQ        | 85%       | 0:50 min  | 🟢 Cumple    |
+| M4Ar7oWX6ulr8-YmALQ4m      | 90%       | 1:56 min  | 🟢 Cumple    |
+| Qt6i_xxLAaEYIfk9mhXh       | 100%      | 2:50 min  | 🟢 Cumple    |
+
+#### Prototipo M2 – Descripción + comparación
+
+| ID                          | Similitud | Tiempo     | Resultado    |
+|-----------------------------|-----------|------------|--------------|
+| ZVuB9PAAbI63JWD_-1QOQ02    | 92%       | 6:19 min   | 🟢 Cumple    |
+| ULmQfIB6e3OIR379gYUyM      | 70%       | 9:26 min   | 🟢 Cumple    |
+| JJkJ1qGcF4yQom7R0vEYr      | 70%       | 9:34 min   | 🟢 Cumple    |
+| WFwwwbOSntpUamcuIrZeG      | 92%       | 12:16 min  | 🟢 Cumple    |
+| 3dw2pBQJlepGXC2UNx         | 92%       | 8:19 min   | 🟢 Cumple    |
+| DYCXSqzwbb1lu1MFf_d5f      | 92%       | 8:39 min   | 🔴 No cumple |
+| FNQM uON_ntbezHvHEP8a9     | 80%       | 7:39 min   | 🔴 No cumple |
+| min6SBxVz6oQs-U10kD6h      | 92%       | 9:16 min   | 🟢 Cumple    |
+| IpRVHFyVvxxRSpRtFZWay      | 80%       | 8:30 min   | 🔴 No cumple |
+| i8mW5UliDsw7mMUBuQz        | 95%       | 7:00 min   | 🟢 Cumple    |
+| P2BGozXKKHbTyOHMOEh2jK     | 92%       | 8:00 min   | 🟢 Cumple    |
+| mb8eLJxUX2TIWuZY8UQ        | 70%       | 5:50 min   | 🔴 No cumple |
+| M4Ar7oWX6ulr8-YmALQ4m      | 92%       | 6:00 min   | 🟢 Cumple    |
+| Qt6i_xxLAaEYIfk9mhXh       | 40%       | 0:30 min   | 🔴 No cumple |
+
+### Conclusiones principales
+
+- El enfoque de **un solo paso (M1)** es claramente superior en velocidad, consistencia y capacidad para detectar anomalías sutiles sin perder información en pasos intermedios.
+- El pipeline de dos pasos (M2) introduce ruido y degradación del contexto, lo que genera más falsos negativos y tiempos mucho mayores.
+- Recomendación: priorizar y optimizar el prototipo M1, migrando a modelos más potentes como Qwen3-VL-8B-Thinking o superiores.
+
+
 
 ### Comparación de Modelos Qwen
 | Modelo                  | Tamaño aproximado | Año de lanzamiento | Rendimiento en imágenes y videos (vs tu 3B) | Detección de anomalías finas (duplicaciones, saltos, desapariciones) | Requerimiento VRAM aproximado (Inferencia FP16/BF16) | Recomendación para tu tarea (Detección de errores en 2 min) | Notas clave |
