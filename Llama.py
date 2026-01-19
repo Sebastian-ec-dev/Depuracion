@@ -4,7 +4,7 @@ import Prompts
 
 # CONFIGURACIÓN
 model_id = "meta-llama/Llama-3.2-3B-Instruct"
-HF_TOKEN = "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"
+HF_TOKEN = "tu_token_aqui"
 
 print("Cargando Llama-3.2-3B-Instruct...")
 tokenizer = AutoTokenizer.from_pretrained(model_id, token=HF_TOKEN)
